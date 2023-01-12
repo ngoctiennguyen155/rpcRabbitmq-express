@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const amqp = require('amqplib');
+const amqp = require("amqplib");
 
-const q = 'rpc_queue';
-amqp.connect('amqp://localhost')
-  .then(conn => {
+const q = "rpc_queue";
+amqp
+  .connect("amqp://tiennn:tiennn@localhost")
+  .then((conn) => {
     return conn.createChannel();
   })
-  .then(ch => {
+  .then((ch) => {
     ch.assertQueue(q, { durable: false });
     ch.prefetch(1);
     console.log(" [x] Awaiting RPC Requests");
-    ch.consume(q, msg => {
-      
+    ch.consume(q, (msg) => {
       const n = parseInt(msg.content.toString());
 
       console.log(" [.] fib(%d)", n);
@@ -29,21 +29,19 @@ amqp.connect('amqp://localhost')
       // you have to call JSON.stringify
       r = JSON.stringify({
         result: r,
-        time: (tEnd - tStart)
+        time: tEnd - tStart,
       });
-      
-      ch.sendToQueue(msg.properties.replyTo,
-        new Buffer(r.toString()),
-        { correlationId: msg.properties.correlationId });
+
+      ch.sendToQueue(msg.properties.replyTo, Buffer.from(r.toString()), {
+        correlationId: msg.properties.correlationId,
+      });
       ch.ack(msg);
-    })
+    });
   });
 
 function fibonacci(n) {
   if (!n) n = 1;
 
-  if (n === 0 || n === 1) 
-    return n;
-  else
-    return fibonacci(n - 1) + fibonacci(n - 2);
+  if (n === 0 || n === 1) return n;
+  else return fibonacci(n - 1) + fibonacci(n - 2);
 }
