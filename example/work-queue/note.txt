@@ -1,0 +1,12 @@
+important: mount volumes rabbitmq 
+
+durable -> restart keep queue alive if set tu true
+
+deliveryMode -> set true if want message keep alive after restart 
+persistent có tác dụng tương tự deliveryMode nma
+Note on message persistence
+Marking messages as persistent doesn't fully guarantee that a message won't be lost. Although it tells RabbitMQ to save the message to disk, there is still a short time window when RabbitMQ has accepted a message and hasn't saved it yet. Also, RabbitMQ doesn't do fsync(2) for every message -- it may be just saved to cache and not really written to the disk. The persistence guarantees aren't strong, but it's more than enough for our simple task queue. If you need a stronger guarantee then you can use publisher confirms.
+
+noAck false -> để comsumer gửi tín hiệu vể queue rằng message đã dc xử lý xong, có thể hủy message
+
+channel.prefetch(1) : rabbitmq không gửi hơn 1 messaage to a worker at the time ( không gửi message tới worker cho tới khi nó hoàn thành xong message trước đó). Điều này có thể dẫn đến queue đầy message nếu tất cả worker đều bận và message thì liên tục tăng.

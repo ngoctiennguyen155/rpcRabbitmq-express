@@ -1,0 +1,5 @@
+fanout: gửi all message to all queue it knows
+
+channel.publish('logs', '', Buffer.from('Hello World!'));
+
+The empty string as second parameter means that we don't want to send the message to any specific queue. We want only to publish it to our 'logs' exchange.
